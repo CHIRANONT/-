@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ตั้งค่าคอร์ทวันนี้</title>
+</head>
+<body>
+    <h1>ตั้งชื่อคอร์ท</h1>
+    <form action="/setup" method="post">
+        <div id="courts">
+            <div>
+                <input type="text" name="court_name" placeholder="ชื่อคอร์ท" required>
+                <button type="button" onclick="removeCourt(this)">ลบ</button>
+            </div>
+        </div>
+        <br>
+        <button type="button" onclick="addCourt()">เพิ่มคอร์ทอีก</button>
+        <br><br>
+        <button type="submit">บันทึกชื่อคอร์ท</button>
+    </form>
+
+    <script>
+        function addCourt() {
+            const div = document.getElementById('courts');
+            const courtDiv = document.createElement('div');
+
+            courtDiv.innerHTML = `
+                <input type="text" name="court_name" placeholder="ชื่อคอร์ท" required>
+                <button type="button" onclick="removeCourt(this)">ลบ</button>
+            `;
+            div.appendChild(courtDiv);
+        }
+
+        function removeCourt(button) {
+            const courtDiv = button.parentElement;
+            courtDiv.remove();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ผลการจัดผู้เล่นลงสนาม</title>
+</head>
+<body>
+    <h1>ผลการจัดผู้เล่นลงสนาม</h1>
+
+    {% for court, name in zip(courts, court_names) %}
+    <h2>{{ name }}</h2>
+    <table border="1">
+        <tr>
+            <th>ชื่อผู้เล่น</th>
+        </tr>
+        {% for player in court %}
+        <tr>
+            <td>{{ player.name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    {% endfor %}
+
+    <a href="/">⬅️ กลับหน้าแรก</a>
+</body>
+</html>
