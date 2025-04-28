@@ -10,10 +10,13 @@
 
     {% for result in results %}
         <p>
-            <b>คอร์ท {{ result.court }}</b> <br>
-            🏆 ชนะ: {{ result.winner }}<br>
-            🥈 แพ้: {{ result.loser }}<br>
-            🏸 คะแนน: {{ result.score1 }} , {{ result.score2 }}
+            <b>คอร์ท {{ result.court }}</b><br>
+            🏆 ทีม A: {{ result.team_a[0] }} และ {{ result.team_a[1] }}<br>
+            🆚 ทีม B: {{ result.team_b[0] }} และ {{ result.team_b[1] }}<br>
+            <b>คะแนน:</b><br>
+            - เกมที่ 1: ทีม A {{ result.game1.team_a }} - ทีม B {{ result.game1.team_b }}<br>
+            - เกมที่ 2: ทีม A {{ result.game2.team_a }} - ทีม B {{ result.game2.team_b }}<br>
+            📋 ผลสรุป: {{ result.result_type }}
         </p>
         <hr>
     {% endfor %}
