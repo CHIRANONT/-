@@ -1,147 +1,128 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, request, redirect, url_for
 import threading
 import time
 
 app = Flask(__name__)
 
+courts = []
 players = []
-results = []
-court_names = []
-match_status = {}
 waiting_queue = []
+match_history = []
 
+# ฟังก์ชันอัปเดตเวลาพัก
 def update_rest_times():
     while True:
         time.sleep(10)
         for player in players:
-            if player['status'] == 'พัก':
+            if player['status'] == 'waiting':
                 player['rest_time'] += 1
 
 @app.route('/setup', methods=['GET', 'POST'])
 def setup():
-    global players, court_names, results, match_status, waiting_queue
+    global courts, players, waiting_queue, match_history
     if request.method == 'POST':
-        court_names_raw = request.form.getlist('court_names')
-        player_names_raw = request.form.getlist('player_names')
+        court_names = request.form.getlist('court_name')
+        player_names = request.form.getlist('player_name')
 
-        if not court_names_raw or not player_names_raw:
-            return "❌ กรุณากรอกชื่อคอร์ทและผู้เล่น!", 400
+        courts.clear()
+        players.clear()
+        waiting_queue.clear()
+        match_history.clear()
 
-        court_names = [name.strip() for name in court_names_raw if name.strip()]
-        player_names = [name.strip() for name in player_names_raw if name.strip()]
-
-        if not court_names or not player_names:
-            return "❌ อย่าเว้นช่องว่าง!", 400
-
-        overlap = set(court_names) & set(player_names)
-        if overlap:
-            return f"❌ ชื่อซ้ำกัน: {', '.join(overlap)}", 400
-
-        players = [{"name": name, "status": "พัก", "rest_time": 0, "court": None, "games_played": 0} for name in player_names]
-        results = []
-        match_status = {court: False for court in court_names}
-        waiting_queue = []
+        for name in court_names:
+            courts.append({'name': name, 'current_match': None})
+        for name in player_names:
+            players.append({'name': name, 'status': 'waiting', 'rest_time': 0, 'matches_played': 0})
 
         return redirect(url_for('home'))
-
     return render_template('setup.html')
 
 @app.route('/')
 def home():
-    if not court_names or not players:
+    if not courts or not players:
         return redirect(url_for('setup'))
-
-    courts_data = []
-    for court in court_names:
-        now_playing = [player for player in players if player['court'] == court]
-        courts_data.append({
-            "court_name": court,
-            "now_playing": now_playing,
-            "match_in_progress": match_status.get(court, False)
-        })
-
-    waiting_players = [player for player in players if player['status'] == 'พัก' and player['court'] is None]
-
-    return render_template('home.html', courts=courts_data, waiting_players=waiting_players, waiting_queue=waiting_queue)
+    return render_template('home.html', courts=courts, players=players, waiting_queue=waiting_queue)
 
 @app.route('/add_waiting', methods=['GET', 'POST'])
 def add_waiting():
     if request.method == 'POST':
-        selected_players = request.form.getlist('selected_players')
-        if len(selected_players) == 4:
-            waiting_queue.append(selected_players)
+        team_a = request.form.getlist('team_a')
+        team_b = request.form.getlist('team_b')
+
+        if len(team_a) == 2 and len(team_b) == 2:
+            waiting_queue.append({'team_a': team_a, 'team_b': team_b})
         return redirect(url_for('home'))
 
-    available_players = [player for player in players if player['status'] == 'พัก' and player['court'] is None]
+    available_players = [p for p in players if p['status'] == 'waiting' and all(p['name'] not in (x for group in waiting_queue for x in (group['team_a'] + group['team_b'])))]
     return render_template('add_waiting.html', players=available_players)
 
-@app.route('/delete_waiting/<int:index>', methods=['POST'])
-def delete_waiting(index):
-    if 0 <= index < len(waiting_queue):
-        del waiting_queue[index]
-    return redirect(url_for('home'))
-
-@app.route('/start_match/<court>', methods=['POST'])
-def start_match(court):
-    match_status[court] = True
-    if waiting_queue:
-        next_group = waiting_queue.pop(0)
-        for name in next_group:
+@app.route('/start_match/<int:court_idx>', methods=['POST'])
+def start_match(court_idx):
+    if court_idx < len(courts) and waiting_queue:
+        next_match = waiting_queue.pop(0)
+        courts[court_idx]['current_match'] = {
+            'team_a': next_match['team_a'],
+            'team_b': next_match['team_b'],
+            'scores': []
+        }
+        for name in next_match['team_a'] + next_match['team_b']:
             for player in players:
                 if player['name'] == name:
-                    player['court'] = court
-                    player['status'] = 'เล่น'
+                    player['status'] = 'playing'
                     player['rest_time'] = 0
+                    break
     return redirect(url_for('home'))
 
-@app.route('/end_match/<court>', methods=['POST'])
-def end_match(court):
-    playing = [player for player in players if player['court'] == court]
-    return render_template('record_result.html', court=court, playing=playing)
+@app.route('/finish_match/<int:court_idx>', methods=['GET', 'POST'])
+def finish_match(court_idx):
+    if court_idx < len(courts):
+        match = courts[court_idx]['current_match']
+        if request.method == 'POST':
+            scores_a1 = int(request.form['score_a1'])
+            scores_b1 = int(request.form['score_b1'])
+            scores_a2 = int(request.form['score_a2'])
+            scores_b2 = int(request.form['score_b2'])
 
-@app.route('/record_result', methods=['POST'])
-def record_result():
-    court = request.form['court']
-    winner = request.form['winner']
-    loser = request.form['loser']
-    score1 = request.form['score1']
-    score2 = request.form['score2']
+            # นับจำนวนเกมที่ชนะ
+            win_a = 0
+            win_b = 0
+            if scores_a1 > scores_b1:
+                win_a += 1
+            else:
+                win_b += 1
+            if scores_a2 > scores_b2:
+                win_a += 1
+            else:
+                win_b += 1
 
-    results.append({
-        "court": court,
-        "winner": winner,
-        "loser": loser,
-        "score1": score1,
-        "score2": score2
-    })
+            winner = 'team_a' if win_a > win_b else 'team_b'
 
-    for player in players:
-        if player['court'] == court:
-            player['games_played'] += 1
-            player['status'] = 'พัก'
-            player['court'] = None
+            match_result = {
+                'court': courts[court_idx]['name'],
+                'team_a': match['team_a'],
+                'team_b': match['team_b'],
+                'scores': [(scores_a1, scores_b1), (scores_a2, scores_b2)],
+                'winner': match[winner]
+            }
+            match_history.append(match_result)
 
-    match_status[court] = False
+            for name in match['team_a'] + match['team_b']:
+                for player in players:
+                    if player['name'] == name:
+                        player['status'] = 'waiting'
+                        player['matches_played'] += 1
+                        break
 
-    if waiting_queue:
-        next_group = waiting_queue.pop(0)
-        for name in next_group:
-            for player in players:
-                if player['name'] == name:
-                    player['court'] = court
-                    player['status'] = 'เล่น'
-                    player['rest_time'] = 0
+            courts[court_idx]['current_match'] = None
+            return redirect(url_for('home'))
 
+        return render_template('record_result.html', match=match, court_name=courts[court_idx]['name'])
     return redirect(url_for('home'))
 
 @app.route('/summary')
 def summary():
-    return render_template('summary.html', players=players)
+    return render_template('summary.html', players=players, match_history=match_history)
 
-@app.route('/result_log')
-def result_log():
-    return render_template('result_log.html', results=results)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     threading.Thread(target=update_rest_times, daemon=True).start()
     app.run(host="0.0.0.0", port=81)
