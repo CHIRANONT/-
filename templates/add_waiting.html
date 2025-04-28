@@ -2,19 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>เลือกชุดผู้เล่นรอแข่ง</title>
+    <title>Badminton Management</title>
 </head>
 <body>
-    <h1>เลือก 4 คน เพื่อรอแข่ง</h1>
+    <h1>Badminton Management</h1>
 
-    <form action="/add_waiting" method="post">
+    <h2>คอร์ทที่กำลังเล่น</h2>
+    {% for court in courts %}
+        <h3>{{ court.name }}</h3>
+        {% if court.current_match %}
+            <p>กำลังแข่งอยู่!</p>
+            <ul>
+                <li>ทีม A: {{ court.current_match.team_a }}</li>
+                <li>ทีม B: {{ court.current_match.team_b }}</li>
+            </ul>
+            <form method="GET" action="/finish_match/{{ loop.index0 }}">
+                <button type="submit">จบแมตช์</button>
+            </form>
+        {% else %}
+            <p>ไม่มีการแข่ง</p>
+        {% endif %}
+    {% endfor %}
+
+    <h2>เลือกชุดผู้เล่นรอ</h2>
+    <a href="/add_waiting">+ จัดชุดผู้เล่นรอ</a>
+
+    <h2>คนพักรอ</h2>
+    <ul>
         {% for player in players %}
-            <input type="checkbox" name="selected_players" value="{{ player.name }}"> {{ player.name }}<br>
+            {% if player.status == 'waiting' %}
+                <li>{{ player.name }} (พักมา {{ player.rest_time }} นาที)</li>
+            {% endif %}
         {% endfor %}
-        <br>
-        <button type="submit">💾 บันทึกชุดรอ</button>
-    </form>
+    </ul>
 
-    <a href="/">🏠 กลับหน้า Home</a>
+    <h2>คิวรอเข้าเล่น</h2>
+    <ul>
+        {% for group in waiting_queue %}
+            <li>ทีม A: {{ group.team_a }} | ทีม B: {{ group.team_b }}</li>
+        {% endfor %}
+    </ul>
+
+    <br>
+    <a href="/summary">ดูสรุปสถิติ</a>
 </body>
 </html>
