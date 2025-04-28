@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Setup Badminton Match</title>
+    <script>
+        function addCourt(name="") {
+            const courtsDiv = document.getElementById('courts');
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <input type="text" name="court_names" value="${name}" placeholder="ชื่อคอร์ท" required>
+                <button type="button" onclick="this.parentElement.remove()">ลบ</button>
+            `;
+            courtsDiv.appendChild(div);
+        }
+
+        function addPlayer(name="") {
+            const playersDiv = document.getElementById('players');
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <input type="text" name="player_names" value="${name}" placeholder="ชื่อผู้เล่น" required>
+                <button type="button" onclick="this.parentElement.remove()">ลบ</button>
+            `;
+            playersDiv.appendChild(div);
+        }
+    </script>
+</head>
+<body>
+    <h1>ตั้งค่า Badminton Match</h1>
+
+    <form action="/setup" method="post">
+        <h2>🖋 ตั้งชื่อคอร์ท</h2>
+        <div id="courts"></div>
+        <button type="button" onclick="addCourt()">➕ เพิ่มคอร์ท</button>
+
+        <h2>🖋 ตั้งชื่อผู้เล่น</h2>
+        <div id="players"></div>
+        <button type="button" onclick="addPlayer()">➕ เพิ่มผู้เล่น</button>
+
+        <br><br>
+        <button type="submit">💾 บันทึกข้อมูล</button>
+    </form>
+
+    <script>
+        window.onload = function() {
+            addCourt();
+            addPlayer();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Badminton Home</title>
+</head>
+<body>
+    <h1>🏸 Badminton Match Manager</h1>
+
+    <a href="/setup">⚙️ แก้ไขคอร์ท/ผู้เล่น</a> |
+    <a href="/summary">📄 สรุปผล</a> |
+    <a href="/result_log">📚 ประวัติแมตช์</a>
+
+    <h2>คอร์ทที่กำลังแข่ง</h2>
+    {% for court in courts %}
+        <h3>{{ court.court_name }}</h3>
+
+        {% if court.match_in_progress %}
+            <p>🎯 แมตช์กำลังแข่ง!</p>
+            <form action="/end_match/{{ court.court_name }}" method="post">
+                <button type="submit">จบแมตช์นี้</button>
+            </form>
+            <ul>
+                {% for player in court.now_playing %}
+                    <li>{{ player.name }}</li>
+                {% endfor %}
+            </ul>
+
+        {% elif court.now_playing %}
+            <p>ผู้เล่นเตรียมพร้อม:</p>
+            <ul>
+                {% for player in court.now_playing %}
+                    <li>{{ player.name }}</li>
+                {% endfor %}
+            </ul>
+            <form action="/start_match/{{ court.court_name }}" method="post">
+                <button type="submit">เริ่มแมตช์นี้</button>
+            </form>
+
+        {% else %}
+            {% if waiting_queue %}
+                <form action="/start_match/{{ court.court_name }}" method="post">
+                    <button type="submit">เริ่มแมตช์จากคิวรอ</button>
+                </form>
+            {% else %}
+                <p>❌ ยังไม่มีผู้เล่นรอ</p>
+            {% endif %}
+        {% endif %}
+        <br>
+    {% endfor %}
+
+    <h2>ชุดผู้เล่นที่รอแข่ง</h2>
+    {% for idx, group in enumerate(waiting_queue) %}
+        <p>ชุดที่ {{ idx + 1 }}:
+        {% for name in group %}
+            {{ name }}
+        {% endfor %}
+        <form action="/delete_waiting/{{ idx }}" method="post" style="display:inline;">
+            <button type="submit">ลบชุดนี้</button>
+        </form>
+        </p>
+    {% endfor %}
+
+    <h2>ผู้เล่นที่พัก</h2>
+    <ul>
+    {% for player in waiting_players %}
+        <li>{{ player.name }} (พักมา {{ player.rest_time }} นาที)</li>
+    {% endfor %}
+    </ul>
+
+    <form action="/add_waiting" method="get">
+        <button type="submit">➕ จัดชุดผู้เล่นรอ</button>
+    </form>
+</body>
+</html>

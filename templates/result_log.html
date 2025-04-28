@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Match Results Log</title>
+</head>
+<body>
+    <h1>ประวัติผลการแข่งขัน</h1>
+    <a href="/">🏠 กลับหน้า Home</a>
+
+    {% for result in results %}
+        <p>
+            <b>คอร์ท {{ result.court }}</b> <br>
+            🏆 ชนะ: {{ result.winner }}<br>
+            🥈 แพ้: {{ result.loser }}<br>
+            🏸 คะแนน: {{ result.score1 }} , {{ result.score2 }}
+        </p>
+        <hr>
+    {% endfor %}
+</body>
+</html>

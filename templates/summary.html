@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Summary</title>
+</head>
+<body>
+    <h1>สรุปผลผู้เล่นทั้งหมด</h1>
+    <a href="/">🏠 กลับหน้า Home</a>
+
+    <table border="1">
+        <tr>
+            <th>ชื่อผู้เล่น</th>
+            <th>จำนวนแมตช์ที่เล่น</th>
+            <th>เวลาพัก (นาที)</th>
+        </tr>
+        {% for player in players %}
+        <tr>
+            <td>{{ player.name }}</td>
+            <td>{{ player.games_played }}</td>
+            <td>{{ player.rest_time }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

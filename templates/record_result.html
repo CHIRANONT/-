@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>บันทึกผลการแข่งขัน</title>
+</head>
+<body>
+    <h1>บันทึกผลแมตช์: {{ court }}</h1>
+
+    <form action="/record_result" method="post">
+        <input type="hidden" name="court" value="{{ court }}">
+
+        <h3>ผู้ชนะ</h3>
+        <select name="winner" required>
+            {% for player in playing %}
+                <option value="{{ player.name }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
+
+        <h3>ผู้แพ้</h3>
+        <select name="loser" required>
+            {% for player in playing %}
+                <option value="{{ player.name }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
+
+        <h3>คะแนนเกม 1</h3>
+        <input type="text" name="score1" placeholder="เช่น 21-15" required>
+
+        <h3>คะแนนเกม 2</h3>
+        <input type="text" name="score2" placeholder="เช่น 21-18" required>
+
+        <br><br>
+        <button type="submit">💾 บันทึกผลแมตช์</button>
+    </form>
+
+    <br>
+    <a href="/">🏠 กลับหน้า Home</a>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>เลือกชุดผู้เล่นรอแข่ง</title>
+</head>
+<body>
+    <h1>เลือก 4 คน เพื่อรอแข่ง</h1>
+
+    <form action="/add_waiting" method="post">
+        {% for player in players %}
+            <input type="checkbox" name="selected_players" value="{{ player.name }}"> {{ player.name }}<br>
+        {% endfor %}
+        <br>
+        <button type="submit">💾 บันทึกชุดรอ</button>
+    </form>
+
+    <a href="/">🏠 กลับหน้า Home</a>
+</body>
+</html>
