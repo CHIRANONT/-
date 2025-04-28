@@ -2,50 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Setup</title>
-    <script>
-        function addCourt() {
-            const div = document.createElement('div');
-            div.innerHTML = `
-                <input type="text" name="court_name" placeholder="ชื่อคอร์ท" required>
-                <button type="button" onclick="this.parentElement.remove()">ลบ</button><br>
-            `;
-            document.getElementById('courts').appendChild(div);
-        }
-        function addPlayer() {
-            const div = document.createElement('div');
-            div.innerHTML = `
-                <input type="text" name="player_name" placeholder="ชื่อผู้เล่น" required>
-                <button type="button" onclick="this.parentElement.remove()">ลบ</button><br>
-            `;
-            document.getElementById('players').appendChild(div);
-        }
-    </script>
+    <title>สรุปสถิติ</title>
 </head>
 <body>
-    <h1>ตั้งค่าคอร์ทและผู้เล่น</h1>
+    <h1>สรุปสถิติ</h1>
+    <ul>
+        {% for player in players %}
+            <li>{{ player.name }} : เล่นไป {{ player.matches_played }} แมตช์</li>
+        {% endfor %}
+    </ul>
 
-    <form method="POST">
-        <h2>คอร์ท</h2>
-        <div id="courts">
-            <div>
-                <input type="text" name="court_name" placeholder="ชื่อคอร์ท" required>
-                <button type="button" onclick="this.parentElement.remove()">ลบ</button><br>
-            </div>
-        </div>
-        <button type="button" onclick="addCourt()">➕ เพิ่มคอร์ท</button>
+    <br>
+    <h2>ประวัติแมตช์</h2>
+    <ul>
+        {% for match in match_history %}
+            <li>{{ match.court }} : ทีมชนะ {{ match.winner }}</li>
+        {% endfor %}
+    </ul>
 
-        <h2>ผู้เล่น</h2>
-        <div id="players">
-            <div>
-                <input type="text" name="player_name" placeholder="ชื่อผู้เล่น" required>
-                <button type="button" onclick="this.parentElement.remove()">ลบ</button><br>
-            </div>
-        </div>
-        <button type="button" onclick="addPlayer()">➕ เพิ่มผู้เล่น</button>
-
-        <br><br>
-        <button type="submit">✅ บันทึกข้อมูล</button>
-    </form>
+    <br>
+    <a href="/">กลับหน้าแรก</a>
 </body>
 </html>
