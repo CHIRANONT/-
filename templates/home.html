@@ -16,7 +16,7 @@
         <h3>{{ court.court_name }}</h3>
 
         {% if court.match_in_progress %}
-            <p>🎯 แมตช์กำลังแข่ง!</p>
+            <p>🎯 แมตช์กำลังแข่งอยู่!</p>
             <form action="/end_match/{{ court.court_name }}" method="post">
                 <button type="submit">จบแมตช์นี้</button>
             </form>
@@ -50,11 +50,9 @@
     {% endfor %}
 
     <h2>ชุดผู้เล่นที่รอแข่ง</h2>
-    {% for idx, group in enumerate(waiting_queue) %}
-        <p>ชุดที่ {{ idx + 1 }}:
-        {% for name in group %}
-            {{ name }}
-        {% endfor %}
+    {% for group in waiting_queue %}
+        {% set idx = loop.index0 %}
+        <p>ชุดที่ {{ idx + 1 }}: ทีม A ({{ group.team_a[0] }} + {{ group.team_a[1] }}) vs ทีม B ({{ group.team_b[0] }} + {{ group.team_b[1] }})
         <form action="/delete_waiting/{{ idx }}" method="post" style="display:inline;">
             <button type="submit">ลบชุดนี้</button>
         </form>
