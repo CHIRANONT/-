@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 import threading
 import time
-import itertools
+from itertools import combinations
 
 app = Flask(__name__)
 
@@ -9,6 +9,7 @@ courts = []
 players = []
 waiting_queue = []
 match_history = []
+player_counter = 1
 
 skill_map = {'BG': 5, 'N-': 3, 'N': 1}
 
@@ -17,11 +18,11 @@ def update_rest_times():
         time.sleep(10)
         for player in players:
             if player['status'] == 'waiting':
-                player['rest_time'] += 1
+                player['rest_time'] += 10
 
 @app.route('/setup', methods=['GET', 'POST'])
 def setup():
-    global courts, players, waiting_queue, match_history
+    global courts, players, waiting_queue, match_history, player_counter
     if request.method == 'POST':
         court_names = request.form.getlist('court_name')
         player_names = request.form.getlist('player_name')
@@ -31,53 +32,24 @@ def setup():
         players.clear()
         waiting_queue.clear()
         match_history.clear()
+        player_counter = 1
 
         for name in court_names:
-            name = name.strip()
-            if name:
-                courts.append({'name': name, 'current_match': None})
+            courts.append({'name': name, 'current_match': None})
 
-        for i, name in enumerate(player_names):
-            name = name.strip()
-            if name:
-                skill = player_skills[i] if i < len(player_skills) else 'N'
-                players.append({
-                    'number': len(players) + 1,
-                    'name': name,
-                    'skill': skill,
-                    'status': 'waiting',
-                    'rest_time': 0,
-                    'matches_played': 0
-                })
-
-        return redirect(url_for('home'))
-
-    return render_template('setup.html', courts=courts, players=players)
-
-@app.route('/add_player', methods=['GET', 'POST'])
-def add_player():
-    if request.method == 'POST':
-        name = request.form.get('name', '').strip()
-        skill = request.form.get('skill', 'N')
-        if name:
+        for name, skill in zip(player_names, player_skills):
             players.append({
-                'number': len(players) + 1,
                 'name': name,
                 'skill': skill,
                 'status': 'waiting',
                 'rest_time': 0,
-                'matches_played': 0
+                'matches_played': 0,
+                'number': player_counter
             })
-        return redirect(url_for('home'))
-    return render_template('add_player.html')
+            player_counter += 1
 
-@app.route('/mark_done/<player_name>', methods=['POST'])
-def mark_done(player_name):
-    for player in players:
-        if player['name'] == player_name:
-            player['status'] = 'done'
-            break
-    return redirect(url_for('home'))
+        return redirect(url_for('home'))
+    return render_template('setup.html')
 
 @app.route('/')
 def home():
@@ -87,9 +59,6 @@ def home():
 
 @app.route('/add_waiting', methods=['GET', 'POST'])
 def add_waiting():
-    if not players:
-        return redirect(url_for('setup'))
-
     if request.method == 'POST':
         team_a = request.form.getlist('team_a')
         team_b = request.form.getlist('team_b')
@@ -104,48 +73,33 @@ def add_waiting():
         used_names.update(group['team_b'])
 
     available_players = [p for p in players if p['status'] == 'waiting' and p['name'] not in used_names]
-
     return render_template('add_waiting.html', players=available_players)
 
-@app.route('/suggest_match', methods=['GET', 'POST'])
-def suggest_match():
-    used_names = set()
-    for m in waiting_queue:
-        used_names.update(m['team_a'])
-        used_names.update(m['team_b'])
-
-    available = [p for p in players if p['status'] == 'waiting' and p['name'] not in used_names]
-
-    best_group = None
-    best_diff = float('inf')
-
-    for group in itertools.combinations(available, 4):
-        all_teams = list(itertools.combinations(group, 2))
-        for team_a in all_teams:
-            team_b = tuple(p for p in group if p not in team_a)
-            score_a = sum(skill_map[p['skill']] for p in team_a)
-            score_b = sum(skill_map[p['skill']] for p in team_b)
-            diff = abs(score_a - score_b)
-            if diff < best_diff:
-                best_diff = diff
-                best_group = (list(team_a), list(team_b))
-
+@app.route('/add_player', methods=['GET', 'POST'])
+def add_player():
+    global player_counter
     if request.method == 'POST':
-        team_a = request.form['team_a'].split(',')
-        team_b = request.form['team_b'].split(',')
-        waiting_queue.append({'team_a': team_a, 'team_b': team_b})
+        name = request.form['name']
+        skill = request.form['skill']
+        players.append({
+            'name': name,
+            'skill': skill,
+            'status': 'waiting',
+            'rest_time': 0,
+            'matches_played': 0,
+            'number': player_counter
+        })
+        player_counter += 1
         return redirect(url_for('home'))
+    return render_template('add_player.html')
 
-    if best_group:
-        match = {
-            'team_a': [p['name'] for p in best_group[0]],
-            'team_b': [p['name'] for p in best_group[1]],
-            'diff': best_diff
-        }
-    else:
-        match = None
-
-    return render_template('suggest_match.html', match=match)
+@app.route('/mark_done/<player_name>', methods=['POST'])
+def mark_done(player_name):
+    for p in players:
+        if p['name'] == player_name:
+            p['status'] = 'done'
+            break
+    return redirect(url_for('home'))
 
 @app.route('/start_match/<int:court_idx>', methods=['POST'])
 def start_match(court_idx):
@@ -182,32 +136,23 @@ def finish_match(court_idx):
         except (KeyError, ValueError):
             return "❌ โปรดกรอกคะแนนให้ครบทุกช่อง", 400
 
-        win_a = 0
-        win_b = 0
+        win_a = (scores_a1 > scores_b1) + (scores_a2 > scores_b2)
+        win_b = (scores_b1 > scores_a1) + (scores_b2 > scores_a2)
 
-        if scores_a1 > scores_b1:
-            win_a += 1
-        elif scores_b1 > scores_a1:
-            win_b += 1
-
-        if scores_a2 > scores_b2:
-            win_a += 1
-        elif scores_b2 > scores_a2:
-            win_b += 1
-
-        if win_a > win_b:
-            winner = 'team_a'
-        elif win_b > win_a:
-            winner = 'team_b'
+        if win_a == win_b:
+            result_type = 'เสมอ'
+        elif win_a > win_b:
+            result_type = 'ทีม A ชนะ'
         else:
-            winner = 'draw'
+            result_type = 'ทีม B ชนะ'
 
         match_result = {
             'court': courts[court_idx]['name'],
             'team_a': match['team_a'],
             'team_b': match['team_b'],
-            'scores': [(scores_a1, scores_b1), (scores_a2, scores_b2)],
-            'winner': match[winner] if winner != 'draw' else 'draw'
+            'game1': {'team_a': scores_a1, 'team_b': scores_b1},
+            'game2': {'team_a': scores_a2, 'team_b': scores_b2},
+            'result_type': result_type
         }
         match_history.append(match_result)
 
@@ -229,30 +174,64 @@ def summary():
 
 @app.route('/result_log')
 def result_log():
-    formatted_results = []
-    for m in match_history:
-        formatted_results.append({
-            'court': m['court'],
-            'team_a': m['team_a'],
-            'team_b': m['team_b'],
-            'game1': {'team_a': m['scores'][0][0], 'team_b': m['scores'][0][1]},
-            'game2': {'team_a': m['scores'][1][0], 'team_b': m['scores'][1][1]},
-            'result_type': (
-                'เสมอ' if m['winner'] == 'draw' else
-                ('ทีม A ชนะ' if m['winner'] == m['team_a'] else 'ทีม B ชนะ')
-            )
-        })
-    return render_template('result_log.html', results=formatted_results)
+    return render_template('result_log.html', results=match_history)
 
-# Templates needed:
-# - home.html (with suggest match link)
-# - add_player.html (form to add name & skill)
-# - add_waiting.html (select 4 players form)
-# - setup.html (input player & court names)
-# - record_result.html (input scores)
-# - suggest_match.html (show recommended match and confirm)
-# - summary.html (player stats)
-# - result_log.html (match history)
+@app.route('/suggest_match', methods=['GET', 'POST'])
+def suggest_match():
+    available = [p for p in players if p['status'] == 'waiting']
+    best = None
+    best_diff = float('inf')
+    for comb in combinations(available, 4):
+        for team_a in combinations(comb, 2):
+            team_b = [p for p in comb if p not in team_a]
+            score_a = sum(skill_map[p['skill']] for p in team_a)
+            score_b = sum(skill_map[p['skill']] for p in team_b)
+            diff = abs(score_a - score_b)
+            if diff < best_diff:
+                best = {
+                    'team_a': [p['name'] for p in team_a],
+                    'team_b': [p['name'] for p in team_b],
+                    'diff': diff
+                }
+                best_diff = diff
+
+    if request.method == 'POST' and best:
+        waiting_queue.append({'team_a': best['team_a'], 'team_b': best['team_b']})
+        return redirect(url_for('home'))
+
+    return render_template('suggest_match.html', match=best)
+
+@app.route('/auto_pair_select', methods=['GET', 'POST'])
+def auto_pair_select():
+    if request.method == 'POST':
+        selected = request.form.getlist('selected_players')
+        selected_players = [p for p in players if p['name'] in selected and p['status'] == 'waiting']
+
+        if len(selected_players) != 4:
+            return "❌ กรุณาเลือกผู้เล่น 4 คน", 400
+
+        best_group = None
+        best_diff = float('inf')
+        for team_a in combinations(selected_players, 2):
+            team_b = [p for p in selected_players if p not in team_a]
+            score_a = sum(skill_map[p['skill']] for p in team_a)
+            score_b = sum(skill_map[p['skill']] for p in team_b)
+            diff = abs(score_a - score_b)
+            if diff < best_diff:
+                best_diff = diff
+                best_group = (list(team_a), list(team_b))
+
+        if 'confirm' in request.form:
+            waiting_queue.append({
+                'team_a': [p['name'] for p in best_group[0]],
+                'team_b': [p['name'] for p in best_group[1]]
+            })
+            return redirect(url_for('home'))
+
+        return render_template('auto_pair_result.html', team_a=best_group[0], team_b=best_group[1], diff=best_diff)
+
+    available_players = [p for p in players if p['status'] == 'waiting']
+    return render_template('auto_pair_select.html', players=available_players)
 
 if __name__ == '__main__':
     threading.Thread(target=update_rest_times, daemon=True).start()
