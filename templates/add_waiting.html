@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>จัดชุดผู้เล่นรอ</title>
+</head>
+<body>
+    <h1>เลือกชุดรอ (2 คนทีม A + 2 คนทีม B)</h1>
+    <form method="POST">
+        <h2>ทีม A</h2>
+        {% for player in players %}
+            <input type="checkbox" name="team_a" value="{{ player.name }}"> {{ player.name }}<br>
+        {% endfor %}
+
+        <h2>ทีม B</h2>
+        {% for player in players %}
+            <input type="checkbox" name="team_b" value="{{ player.name }}"> {{ player.name }}<br>
+        {% endfor %}
+
+        <br><button type="submit">✅ เพิ่มชุดนี้</button>
+    </form>
+    <br><a href="/">🏠 กลับหน้าหลัก</a>
+</body>
+</html>

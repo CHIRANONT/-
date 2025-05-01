@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Setup</title>
+</head>
+<body>
+    <h1>ตั้งค่าคอร์ท + ผู้เล่น</h1>
+    <form method="POST">
+        <h2>ชื่อคอร์ท</h2>
+        <div id="court-list">
+            <input type="text" name="court_name">
+        </div>
+        <button type="button" onclick="addCourt()">➕ เพิ่มคอร์ท</button>
+
+        <h2>ชื่อผู้เล่น</h2>
+        <div id="player-list">
+            <input type="text" name="player_name">
+        </div>
+        <button type="button" onclick="addPlayer()">➕ เพิ่มผู้เล่น</button>
+
+        <br><br><button type="submit">✅ บันทึก</button>
+    </form>
+
+    <script>
+        function addCourt() {
+            const div = document.createElement('div');
+            div.innerHTML = '<input type="text" name="court_name">';
+            document.getElementById('court-list').appendChild(div);
+        }
+        function addPlayer() {
+            const div = document.createElement('div');
+            div.innerHTML = '<input type="text" name="player_name">';
+            document.getElementById('player-list').appendChild(div);
+        }
+    </script>
+</body>
+</html>

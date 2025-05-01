@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>จัดผู้เล่นเอง</title>
+</head>
+<body>
+    <h1>จัดผู้เล่นเอง</h1>
+
+    <form action="/confirm_manual" method="post">
+        {% for court in court_names %}
+            <h2>{{ court }}</h2>
+            {% for player in players %}
+                <input type="checkbox" name="selected_players_{{ court }}" value="{{ player.name }}"> {{ player.name }}<br>
+            {% endfor %}
+            <br>
+        {% endfor %}
+        <button type="submit">ยืนยัน</button>
+    </form>
+</body>
+</html>

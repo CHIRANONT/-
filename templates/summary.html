@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>สรุปผล</title>
+</head>
+<body>
+    <h1>📊 สรุปสถิติผู้เล่น</h1>
+    <table border="1">
+        <tr><th>ชื่อ</th><th>สถานะ</th><th>พัก (นาที)</th><th>แมตช์ที่เล่น</th></tr>
+        {% for player in players %}
+            <tr>
+                <td>{{ player.name }}</td>
+                <td>{{ player.status }}</td>
+                <td>{{ player.rest_time }}</td>
+                <td>{{ player.matches_played }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h2>📜 ประวัติแมตช์</h2>
+    {% for match in match_history %}
+        <p><strong>{{ match.court }}</strong> | ทีม A: {{ match.team_a|join(', ') }} vs ทีม B: {{ match.team_b|join(', ') }}
+        <br>Game 1: {{ match.scores[0][0] }} - {{ match.scores[0][1] }} |
+        Game 2: {{ match.scores[1][0] }} - {{ match.scores[1][1] }}
+        <br>✅ ชนะ: {{ match.winner|join(', ') }}</p>
+        <hr>
+    {% endfor %}
+
+    <a href="/">🏠 กลับหน้าหลัก</a>
+</body>
+</html>

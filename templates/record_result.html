@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>กรอกผลการแข่งขัน</title>
+</head>
+<body>
+    <h1>จบแมตช์ - {{ court_name }}</h1>
+    <form method="POST">
+        <h2>เกมที่ 1</h2>
+        <label>ทีม A:</label>
+        <input type="number" name="score_a1" required>
+        <label>ทีม B:</label>
+        <input type="number" name="score_b1" required>
+
+        <h2>เกมที่ 2</h2>
+        <label>ทีม A:</label>
+        <input type="number" name="score_a2" required>
+        <label>ทีม B:</label>
+        <input type="number" name="score_b2" required>
+
+        <br><br><button type="submit">✅ บันทึกผล</button>
+    </form>
+    <br><a href="/">🏠 กลับหน้าหลัก</a>
+</body>
+</html>

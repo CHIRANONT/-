@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>จัดผู้เล่นลงสนาม</title>
+</head>
+<body>
+    <h1>จัดผู้เล่นลงสนาม</h1>
+
+    {% for court, name in court_data %}
+        <h2>{{ name }}</h2>
+        <ul>
+            {% for player in court %}
+                <li>{{ player.name }}</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    
+    <br>
+    <a href="{{ url_for('home') }}">กลับไปหน้าหลัก</a>
+</body>
+</html>

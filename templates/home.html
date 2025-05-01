@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>หน้าหลัก</title>
+</head>
+<body>
+    <h1>🏸 สถานะสนาม</h1>
+    {% for court in courts %}
+        <h2>คอร์ท: {{ court.name }}</h2>
+        {% if court.current_match %}
+            <p>ทีม A: {{ court.current_match.team_a|join(', ') }}</p>
+            <p>ทีม B: {{ court.current_match.team_b|join(', ') }}</p>
+            <form method="POST" action="/finish_match/{{ loop.index0 }}">
+                <button type="submit">จบแมตช์</button>
+            </form>
+        {% else %}
+            {% if waiting_queue %}
+                <form method="POST" action="/start_match/{{ loop.index0 }}">
+                    <button type="submit">ส่งชุดต่อไปลงสนาม</button>
+                </form>
+            {% else %}
+                <p>ยังไม่มีชุดรอ</p>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    <hr>
+    <h2>📋 คิวผู้เล่นรอ</h2>
+    {% for group in waiting_queue %}
+        <p>ทีม A: {{ group.team_a|join(', ') }} | ทีม B: {{ group.team_b|join(', ') }}</p>
+    {% endfor %}
+    <a href="/add_waiting">➕ จัดชุดผู้เล่นรอ</a>
+
+    <hr>
+    <a href="/summary">📊 ดูสรุป</a> | <a href="/setup">⚙️ ตั้งค่าใหม่</a>
+</body>
+</html>
