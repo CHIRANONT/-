@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>แนะนำแมตช์อัตโนมัติ</title>
+</head>
+<body>
+    <h1>🤖 แนะนำแมตช์</h1>
+
+    {% if match %}
+        <h2>ทีม A</h2>
+        <ul>
+            {% for name in match.team_a %}
+                <li>{{ name }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>ทีม B</h2>
+        <ul>
+            {% for name in match.team_b %}
+                <li>{{ name }}</li>
+            {% endfor %}
+        </ul>
+
+        <p><strong>ความต่างคะแนน:</strong> {{ match.diff }}</p>
+
+        <form method="POST">
+            <input type="hidden" name="team_a" value="{{ ','.join(match.team_a) }}">
+            <input type="hidden" name="team_b" value="{{ ','.join(match.team_b) }}">
+            <button type="submit">✅ เพิ่มเข้าคิวรอ</button>
+        </form>
+    {% else %}
+        <p style="color: gray;">ไม่สามารถแนะนำแมตช์ได้ในตอนนี้ (อาจมีผู้เล่นน้อยกว่า 4 คนที่รออยู่ หรืออยู่ในคิวแล้ว)</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('home') }}">🏠 กลับหน้าหลัก</a>
+</body>
+</html>
