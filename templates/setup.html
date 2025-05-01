@@ -9,29 +9,41 @@
     <form method="POST">
         <h2>ชื่อคอร์ท</h2>
         <div id="court-names">
-            <input type="text" name="court_name"><br>
+            <div>
+                <input type="text" name="court_name">
+                <button type="button" onclick="removeElement(this)">❌</button><br>
+            </div>
         </div>
         <button type="button" onclick="addCourt()">➕ เพิ่มคอร์ท</button>
 
         <h2>ชื่อนักกีฬา</h2>
         <div id="player-names">
-            <input type="text" name="player_name"><br>
+            <div>
+                <input type="text" name="player_name">
+                <button type="button" onclick="removeElement(this)">❌</button><br>
+            </div>
         </div>
         <button type="button" onclick="addPlayer()">➕ เพิ่มนักกีฬา</button>
+
         <br><br>
         <input type="submit" value="เริ่มต้นใช้งาน">
     </form>
 
     <script>
         function addCourt() {
-            var div = document.createElement("div");
-            div.innerHTML = '<input type="text" name="court_name"><br>';
+            const div = document.createElement("div");
+            div.innerHTML = '<input type="text" name="court_name"> <button type="button" onclick="removeElement(this)">❌</button><br>';
             document.getElementById("court-names").appendChild(div);
         }
+
         function addPlayer() {
-            var div = document.createElement("div");
-            div.innerHTML = '<input type="text" name="player_name"><br>';
+            const div = document.createElement("div");
+            div.innerHTML = '<input type="text" name="player_name"> <button type="button" onclick="removeElement(this)">❌</button><br>';
             document.getElementById("player-names").appendChild(div);
+        }
+
+        function removeElement(button) {
+            button.parentElement.remove();
         }
     </script>
 </body>
