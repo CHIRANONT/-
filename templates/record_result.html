@@ -7,16 +7,6 @@
 <body>
     <h1>กรอกผลการแข่งขัน - คอร์ท {{ court_name }}</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li style="color: red;">{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-
     <form method="post">
         <p>เกมที่ 1: 
             <input type="number" name="score_a1" required> -
