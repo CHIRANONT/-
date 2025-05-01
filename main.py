@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 import threading
 import time
+import itertools
 
 app = Flask(__name__)
 
@@ -8,6 +9,8 @@ courts = []
 players = []
 waiting_queue = []
 match_history = []
+
+skill_map = {'BG': 5, 'N-': 3, 'N': 1}
 
 def update_rest_times():
     while True:
@@ -100,12 +103,49 @@ def add_waiting():
         used_names.update(group['team_a'])
         used_names.update(group['team_b'])
 
-    available_players = [
-        p for p in players
-        if p['status'] == 'waiting' and p['name'] not in used_names
-    ]
+    available_players = [p for p in players if p['status'] == 'waiting' and p['name'] not in used_names]
 
     return render_template('add_waiting.html', players=available_players)
+
+@app.route('/suggest_match', methods=['GET', 'POST'])
+def suggest_match():
+    used_names = set()
+    for m in waiting_queue:
+        used_names.update(m['team_a'])
+        used_names.update(m['team_b'])
+
+    available = [p for p in players if p['status'] == 'waiting' and p['name'] not in used_names]
+
+    best_group = None
+    best_diff = float('inf')
+
+    for group in itertools.combinations(available, 4):
+        all_teams = list(itertools.combinations(group, 2))
+        for team_a in all_teams:
+            team_b = tuple(p for p in group if p not in team_a)
+            score_a = sum(skill_map[p['skill']] for p in team_a)
+            score_b = sum(skill_map[p['skill']] for p in team_b)
+            diff = abs(score_a - score_b)
+            if diff < best_diff:
+                best_diff = diff
+                best_group = (list(team_a), list(team_b))
+
+    if request.method == 'POST':
+        team_a = request.form['team_a'].split(',')
+        team_b = request.form['team_b'].split(',')
+        waiting_queue.append({'team_a': team_a, 'team_b': team_b})
+        return redirect(url_for('home'))
+
+    if best_group:
+        match = {
+            'team_a': [p['name'] for p in best_group[0]],
+            'team_b': [p['name'] for p in best_group[1]],
+            'diff': best_diff
+        }
+    else:
+        match = None
+
+    return render_template('suggest_match.html', match=match)
 
 @app.route('/start_match/<int:court_idx>', methods=['POST'])
 def start_match(court_idx):
