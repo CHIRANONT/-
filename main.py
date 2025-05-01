@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import threading
 import time
 from itertools import combinations
 
 app = Flask(__name__)
+app.secret_key = 'secret'
 
 courts = []
 players = []
@@ -134,7 +135,8 @@ def finish_match(court_idx):
             scores_a2 = int(request.form['score_a2'])
             scores_b2 = int(request.form['score_b2'])
         except (KeyError, ValueError):
-            return "❌ โปรดกรอกคะแนนให้ครบทุกช่อง", 400
+            flash('❌ โปรดกรอกคะแนนให้ครบทุกช่อง')
+            return redirect(url_for('finish_match', court_idx=court_idx))
 
         win_a = (scores_a1 > scores_b1) + (scores_a2 > scores_b2)
         win_b = (scores_b1 > scores_a1) + (scores_b2 > scores_a2)
