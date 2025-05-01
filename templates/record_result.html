@@ -2,25 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>กรอกผลการแข่งขัน</title>
+    <title>บันทึกผลการแข่งขัน</title>
 </head>
 <body>
-    <h1>จบแมตช์ - {{ court_name }}</h1>
+    <h1>บันทึกผลการแข่งขัน: {{ court_name }}</h1>
     <form method="POST">
         <h2>เกมที่ 1</h2>
-        <label>ทีม A:</label>
-        <input type="number" name="score_a1" required>
-        <label>ทีม B:</label>
-        <input type="number" name="score_b1" required>
+        ทีม A: <input type="number" name="score_a1" required> vs ทีม B: <input type="number" name="score_b1" required><br>
 
         <h2>เกมที่ 2</h2>
-        <label>ทีม A:</label>
-        <input type="number" name="score_a2" required>
-        <label>ทีม B:</label>
-        <input type="number" name="score_b2" required>
+        ทีม A: <input type="number" name="score_a2" required> vs ทีม B: <input type="number" name="score_b2" required><br><br>
 
-        <br><br><button type="submit">✅ บันทึกผล</button>
+        <input type="submit" value="บันทึกผล">
     </form>
-    <br><a href="/">🏠 กลับหน้าหลัก</a>
+    <a href="{{ url_for('home') }}">🏠 กลับหน้าหลัก</a>
 </body>
 </html>
