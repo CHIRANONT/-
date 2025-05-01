@@ -9,7 +9,7 @@ players = []
 waiting_queue = []
 match_history = []
 
-# ฟังก์ชันสำหรับนับเวลาพักของผู้เล่นที่รอ
+# Background thread สำหรับนับเวลาพักของผู้เล่น
 def update_rest_times():
     while True:
         time.sleep(10)
@@ -30,11 +30,17 @@ def setup():
         match_history.clear()
 
         for name in court_names:
-            courts.append({'name': name, 'current_match': None})
+            name = name.strip()
+            if name:
+                courts.append({'name': name, 'current_match': None})
+
         for name in player_names:
-            players.append({'name': name, 'status': 'waiting', 'rest_time': 0, 'matches_played': 0})
+            name = name.strip()
+            if name:
+                players.append({'name': name, 'status': 'waiting', 'rest_time': 0, 'matches_played': 0})
 
         return redirect(url_for('home'))
+
     return render_template('setup.html')
 
 @app.route('/')
@@ -138,7 +144,6 @@ def finish_match(court_idx):
 def summary():
     return render_template('summary.html', players=players, match_history=match_history)
 
-# ✅ ใหม่: หน้าดูประวัติผลการแข่งขันย้อนหลัง
 @app.route('/result_log')
 def result_log():
     formatted_results = []
