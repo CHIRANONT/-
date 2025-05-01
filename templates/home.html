@@ -26,7 +26,7 @@
                 vs 
                 {{ courts[i].current_match.team_b[0] }} & {{ courts[i].current_match.team_b[1] }}
             </p>
-            <form method="POST" action="{{ url_for('finish_match', court_idx=i) }}">
+            <form method="GET" action="{{ url_for('finish_match', court_idx=i) }}">
                 <button type="submit">✅ จบแมตช์นี้</button>
             </form>
         {% else %}
