@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>เพิ่มผู้เล่นใหม่</title>
+</head>
+<body>
+    <h1>เพิ่มผู้เล่นใหม่ระหว่างวัน</h1>
+    <form method="POST">
+        <label>ชื่อผู้เล่น:</label>
+        <input type="text" name="name" required>
+        <label>ระดับฝีมือ:</label>
+        <select name="skill">
+            <option value="BG">BG</option>
+            <option value="N-">N-</option>
+            <option value="N">N</option>
+        </select>
+        <button type="submit">เพิ่ม</button>
+    </form>
+    <br>
+    <a href="{{ url_for('home') }}">🏠 กลับหน้าหลัก</a>
+</body>
+</html>
