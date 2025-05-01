@@ -2,41 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title>หน้าหลัก - ระบบจัดสนามแบดมินตัน</title>
 </head>
 <body>
-    <h1>ระบบจัดการสนามแบดมินตัน</h1>
+    <h1>🏸 ระบบจัดสนามแบดมินตัน</h1>
 
-    <a href="{{ url_for('add_waiting') }}">➕ เพิ่มคิวการแข่งขัน</a> |
-    <a href="{{ url_for('summary') }}">📊 สรุป</a> |
-    <a href="{{ url_for('result_log') }}">📜 ดูผลย้อนหลัง</a>
+    <nav>
+        <a href="{{ url_for('add_player') }}">➕ เพิ่มผู้เล่นระหว่างวัน</a> |
+        <a href="{{ url_for('add_waiting') }}">📋 จัดคิวลงสนาม</a> |
+        <a href="{{ url_for('summary') }}">📊 สรุป</a> |
+        <a href="{{ url_for('result_log') }}">📈 ประวัติผล</a> |
+        <a href="{{ url_for('setup') }}">⚙️ ตั้งค่าเริ่มต้น</a>
+    </nav>
 
-    <h2>สนามทั้งหมด</h2>
-    {% for court in courts %}
-        <h3>{{ court.name }}</h3>
-        {% if court.current_match %}
-            <p>กำลังแข่ง: {{ court.current_match.team_a }} vs {{ court.current_match.team_b }}</p>
-            <form action="{{ url_for('finish_match', court_idx=loop.index0) }}" method="get">
-                <button type="submit">✅ จบแมตช์</button>
-            </form>
-        {% else %}
-            <p>ว่าง</p>
-            <form action="{{ url_for('start_match', court_idx=loop.index0) }}" method="post">
-                <button type="submit">▶️ เริ่มแมตช์</button>
-            </form>
-        {% endif %}
-    {% endfor %}
+    <hr>
 
-    <h2>ผู้เล่นทั้งหมด</h2>
+    <h2>📃 รายชื่อนักกีฬา</h2>
     <ul>
     {% for player in players %}
-        <li>{{ player.name }} - {{ player.status }} - พักมาแล้ว {{ player.rest_time }} วินาที - เล่นแล้ว {{ player.matches_played }} ครั้ง</li>
+        <li>
+            หมายเลข {{ player.number }} - {{ player.name }} ({{ player.skill }}) - 
+            <strong>สถานะ:</strong> {{ player.status }}
+            {% if player.status != 'done' %}
+                <form method="POST" action="{{ url_for('mark_done', player_name=player.name) }}" style="display:inline;">
+                    <button type="submit">เลิกเล่นแล้ววันนี้</button>
+                </form>
+            {% endif %}
+        </li>
     {% endfor %}
     </ul>
 
-    <h2>คิวรอ</h2>
-    {% for queue in waiting_queue %}
-        <p>{{ queue.team_a }} vs {{ queue.team_b }}</p>
+    <hr>
+
+    <h2>🏟️ คอร์ทที่ใช้งาน</h2>
+    {% for i, court in enumerate(courts) %}
+        <div style="margin-bottom: 1em;">
+            <h3>คอร์ท {{ court.name }}</h3>
+            {% if court.current_match %}
+                <p><strong>กำลังแข่ง:</strong> {{ court.current_match.team_a }} vs {{ court.current_match.team_b }}</p>
+                <form method="GET" action="{{ url_for('finish_match', court_idx=i) }}">
+                    <button type="submit">จบแมตช์</button>
+                </form>
+            {% else %}
+                <p><em>ว่าง</em></p>
+                <form method="POST" action="{{ url_for('start_match', court_idx=i) }}">
+                    <button type="submit" {% if not waiting_queue %}disabled{% endif %}>เริ่มแมตช์</button>
+                </form>
+            {% endif %}
+        </div>
     {% endfor %}
+
+    <hr>
+
+    <h2>⏳ คิวรอแข่ง</h2>
+    {% if waiting_queue %}
+        <ul>
+        {% for match in waiting_queue %}
+            <li>
+                ทีม A: {{ match.team_a }} vs ทีม B: {{ match.team_b }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p><em>ยังไม่มีคิว</em></p>
+    {% endif %}
 </body>
 </html>
