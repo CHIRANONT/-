@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, url_for
 import threading
 import time
@@ -9,7 +10,6 @@ players = []
 waiting_queue = []
 match_history = []
 
-# Background thread สำหรับนับเวลาพักของผู้เล่น
 def update_rest_times():
     while True:
         time.sleep(10)
@@ -23,6 +23,7 @@ def setup():
     if request.method == 'POST':
         court_names = request.form.getlist('court_name')
         player_names = request.form.getlist('player_name')
+        player_skills = request.form.getlist('player_skill')
 
         courts.clear()
         players.clear()
@@ -34,14 +35,22 @@ def setup():
             if name:
                 courts.append({'name': name, 'current_match': None})
 
-        for name in player_names:
+        for i, name in enumerate(player_names):
             name = name.strip()
             if name:
-                players.append({'name': name, 'status': 'waiting', 'rest_time': 0, 'matches_played': 0})
+                skill = player_skills[i] if i < len(player_skills) else 'N'
+                players.append({
+                    'number': len(players) + 1,
+                    'name': name,
+                    'skill': skill,
+                    'status': 'waiting',
+                    'rest_time': 0,
+                    'matches_played': 0
+                })
 
         return redirect(url_for('home'))
 
-    return render_template('setup.html')
+    return render_template('setup.html', courts=courts, players=players)
 
 @app.route('/')
 def home():
@@ -108,23 +117,30 @@ def finish_match(court_idx):
 
         win_a = 0
         win_b = 0
+
         if scores_a1 > scores_b1:
             win_a += 1
-        else:
-            win_b += 1
-        if scores_a2 > scores_b2:
-            win_a += 1
-        else:
+        elif scores_b1 > scores_a1:
             win_b += 1
 
-        winner = 'team_a' if win_a > win_b else 'team_b'
+        if scores_a2 > scores_b2:
+            win_a += 1
+        elif scores_b2 > scores_a2:
+            win_b += 1
+
+        if win_a > win_b:
+            winner = 'team_a'
+        elif win_b > win_a:
+            winner = 'team_b'
+        else:
+            winner = 'draw'
 
         match_result = {
             'court': courts[court_idx]['name'],
             'team_a': match['team_a'],
             'team_b': match['team_b'],
             'scores': [(scores_a1, scores_b1), (scores_a2, scores_b2)],
-            'winner': match[winner]
+            'winner': match[winner] if winner != 'draw' else 'draw'
         }
         match_history.append(match_result)
 
@@ -154,7 +170,10 @@ def result_log():
             'team_b': m['team_b'],
             'game1': {'team_a': m['scores'][0][0], 'team_b': m['scores'][0][1]},
             'game2': {'team_a': m['scores'][1][0], 'team_b': m['scores'][1][1]},
-            'result_type': 'ทีม A ชนะ' if m['winner'] == m['team_a'] else 'ทีม B ชนะ'
+            'result_type': (
+                'เสมอ' if m['winner'] == 'draw' else
+                ('ทีม A ชนะ' if m['winner'] == m['team_a'] else 'ทีม B ชนะ')
+            )
         })
     return render_template('result_log.html', results=formatted_results)
 
