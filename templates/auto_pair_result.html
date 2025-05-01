@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>เลือกผู้เล่น 4 คน</title>
+</head>
+<body>
+    <h1>🎯 เลือกผู้เล่น 4 คนเพื่อให้ระบบจัดทีมให้</h1>
+
+    <form method="POST">
+        {% for player in players %}
+            <input type="checkbox" name="selected_players" value="{{ player.name }}">
+            {{ player.name }} ({{ player.skill }})<br>
+        {% endfor %}
+        <br>
+        <button type="submit">⚖️ แนะนำการจัดทีม</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('home') }}">🏠 กลับหน้าหลัก</a>
+</body>
+</html>
