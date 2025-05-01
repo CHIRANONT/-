@@ -3,73 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>Setup</title>
-    <script>
-        function addCourt() {
-            const list = document.getElementById('court-list');
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.name = 'court_names';
-            input.placeholder = 'ชื่อคอร์ท';
-            input.required = true;
-            list.appendChild(input);
-
-            const btn = document.createElement('button');
-            btn.innerText = 'ลบ';
-            btn.type = 'button';
-            btn.onclick = () => {
-                list.removeChild(input);
-                list.removeChild(btn);
-            };
-            list.appendChild(btn);
-        }
-
-        function addPlayer() {
-            const list = document.getElementById('player-list');
-
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.name = 'player_names';
-            nameInput.placeholder = 'ชื่อนักกีฬา';
-            nameInput.required = true;
-
-            const levelSelect = document.createElement('select');
-            levelSelect.name = 'player_levels';
-            levelSelect.required = true;
-            ['BG', 'N-', 'N'].forEach(level => {
-                const option = document.createElement('option');
-                option.value = level;
-                option.text = level;
-                levelSelect.appendChild(option);
-            });
-
-            list.appendChild(nameInput);
-            list.appendChild(levelSelect);
-
-            const btn = document.createElement('button');
-            btn.innerText = 'ลบ';
-            btn.type = 'button';
-            btn.onclick = () => {
-                list.removeChild(nameInput);
-                list.removeChild(levelSelect);
-                list.removeChild(btn);
-            };
-            list.appendChild(btn);
-        }
-    </script>
 </head>
 <body>
-    <h1>ตั้งค่าคอร์ทและรายชื่อนักกีฬา</h1>
-    <form action="/setup" method="post">
-        <h2>คอร์ท</h2>
-        <div id="court-list"></div>
-        <button type="button" onclick="addCourt()">เพิ่มคอร์ท</button>
+    <h1>ตั้งค่าคอร์ทและผู้เล่น</h1>
+    <form method="POST">
+        <h2>ชื่อคอร์ท</h2>
+        <div id="court-names">
+            <input type="text" name="court_name"><br>
+        </div>
+        <button type="button" onclick="addCourt()">➕ เพิ่มคอร์ท</button>
 
-        <h2>นักกีฬา</h2>
-        <div id="player-list"></div>
-        <button type="button" onclick="addPlayer()">เพิ่มนักกีฬา</button>
-
+        <h2>ชื่อนักกีฬา</h2>
+        <div id="player-names">
+            <input type="text" name="player_name"><br>
+        </div>
+        <button type="button" onclick="addPlayer()">➕ เพิ่มนักกีฬา</button>
         <br><br>
-        <button type="submit">บันทึก</button>
+        <input type="submit" value="เริ่มต้นใช้งาน">
     </form>
+
+    <script>
+        function addCourt() {
+            var div = document.createElement("div");
+            div.innerHTML = '<input type="text" name="court_name"><br>';
+            document.getElementById("court-names").appendChild(div);
+        }
+        function addPlayer() {
+            var div = document.createElement("div");
+            div.innerHTML = '<input type="text" name="player_name"><br>';
+            document.getElementById("player-names").appendChild(div);
+        }
+    </script>
 </body>
 </html>
