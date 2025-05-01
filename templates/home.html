@@ -2,37 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>หน้าหลัก</title>
+    <title>Home</title>
 </head>
 <body>
-    <h1>🏸 สถานะสนาม</h1>
+    <h1>ระบบจัดการสนามแบดมินตัน</h1>
+
+    <a href="{{ url_for('add_waiting') }}">➕ เพิ่มคิวการแข่งขัน</a> |
+    <a href="{{ url_for('summary') }}">📊 สรุป</a> |
+    <a href="{{ url_for('result_log') }}">📜 ดูผลย้อนหลัง</a>
+
+    <h2>สนามทั้งหมด</h2>
     {% for court in courts %}
-        <h2>คอร์ท: {{ court.name }}</h2>
+        <h3>{{ court.name }}</h3>
         {% if court.current_match %}
-            <p>ทีม A: {{ court.current_match.team_a|join(', ') }}</p>
-            <p>ทีม B: {{ court.current_match.team_b|join(', ') }}</p>
-            <form method="POST" action="/finish_match/{{ loop.index0 }}">
-                <button type="submit">จบแมตช์</button>
+            <p>กำลังแข่ง: {{ court.current_match.team_a }} vs {{ court.current_match.team_b }}</p>
+            <form action="{{ url_for('finish_match', court_idx=loop.index0) }}" method="get">
+                <button type="submit">✅ จบแมตช์</button>
             </form>
         {% else %}
-            {% if waiting_queue %}
-                <form method="POST" action="/start_match/{{ loop.index0 }}">
-                    <button type="submit">ส่งชุดต่อไปลงสนาม</button>
-                </form>
-            {% else %}
-                <p>ยังไม่มีชุดรอ</p>
-            {% endif %}
+            <p>ว่าง</p>
+            <form action="{{ url_for('start_match', court_idx=loop.index0) }}" method="post">
+                <button type="submit">▶️ เริ่มแมตช์</button>
+            </form>
         {% endif %}
     {% endfor %}
 
-    <hr>
-    <h2>📋 คิวผู้เล่นรอ</h2>
-    {% for group in waiting_queue %}
-        <p>ทีม A: {{ group.team_a|join(', ') }} | ทีม B: {{ group.team_b|join(', ') }}</p>
+    <h2>ผู้เล่นทั้งหมด</h2>
+    <ul>
+    {% for player in players %}
+        <li>{{ player.name }} - {{ player.status }} - พักมาแล้ว {{ player.rest_time }} วินาที - เล่นแล้ว {{ player.matches_played }} ครั้ง</li>
     {% endfor %}
-    <a href="/add_waiting">➕ จัดชุดผู้เล่นรอ</a>
+    </ul>
 
-    <hr>
-    <a href="/summary">📊 ดูสรุป</a> | <a href="/setup">⚙️ ตั้งค่าใหม่</a>
+    <h2>คิวรอ</h2>
+    {% for queue in waiting_queue %}
+        <p>{{ queue.team_a }} vs {{ queue.team_b }}</p>
+    {% endfor %}
 </body>
 </html>
