@@ -16,10 +16,15 @@
         </div>
         <button type="button" onclick="addCourt()">➕ เพิ่มคอร์ท</button>
 
-        <h2>ชื่อนักกีฬา</h2>
-        <div id="player-names">
+        <h2>ชื่อนักกีฬาและระดับฝีมือ</h2>
+        <div id="player-list">
             <div>
-                <input type="text" name="player_name">
+                <input type="text" name="player_name" placeholder="ชื่อนักกีฬา">
+                <select name="player_skill">
+                    <option value="BG">BG</option>
+                    <option value="N-">N-</option>
+                    <option value="N">N</option>
+                </select>
                 <button type="button" onclick="removeElement(this)">❌</button><br>
             </div>
         </div>
@@ -38,8 +43,14 @@
 
         function addPlayer() {
             const div = document.createElement("div");
-            div.innerHTML = '<input type="text" name="player_name"> <button type="button" onclick="removeElement(this)">❌</button><br>';
-            document.getElementById("player-names").appendChild(div);
+            div.innerHTML = '<input type="text" name="player_name" placeholder="ชื่อนักกีฬา"> ' +
+                            '<select name="player_skill">' +
+                                '<option value="BG">BG</option>' +
+                                '<option value="N-">N-</option>' +
+                                '<option value="N">N</option>' +
+                            '</select>' +
+                            ' <button type="button" onclick="removeElement(this)">❌</button><br>';
+            document.getElementById("player-list").appendChild(div);
         }
 
         function removeElement(button) {
