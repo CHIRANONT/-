@@ -35,7 +35,8 @@
     <hr>
 
     <h2>🏟️ คอร์ทที่ใช้งาน</h2>
-    {% for i, court in enumerate(courts) %}
+    {% for court in courts %}
+        {% set i = loop.index0 %}
         <div style="margin-bottom: 1em;">
             <h3>คอร์ท {{ court.name }}</h3>
             {% if court.current_match %}
