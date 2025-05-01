@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for
 import threading
 import time
@@ -52,6 +51,31 @@ def setup():
 
     return render_template('setup.html', courts=courts, players=players)
 
+@app.route('/add_player', methods=['GET', 'POST'])
+def add_player():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        skill = request.form.get('skill', 'N')
+        if name:
+            players.append({
+                'number': len(players) + 1,
+                'name': name,
+                'skill': skill,
+                'status': 'waiting',
+                'rest_time': 0,
+                'matches_played': 0
+            })
+        return redirect(url_for('home'))
+    return render_template('add_player.html')
+
+@app.route('/mark_done/<player_name>', methods=['POST'])
+def mark_done(player_name):
+    for player in players:
+        if player['name'] == player_name:
+            player['status'] = 'done'
+            break
+    return redirect(url_for('home'))
+
 @app.route('/')
 def home():
     if not courts or not players:
@@ -76,7 +100,10 @@ def add_waiting():
         used_names.update(group['team_a'])
         used_names.update(group['team_b'])
 
-    available_players = [p for p in players if p['status'] == 'waiting' and p['name'] not in used_names]
+    available_players = [
+        p for p in players
+        if p['status'] == 'waiting' and p['name'] not in used_names
+    ]
 
     return render_template('add_waiting.html', players=available_players)
 
