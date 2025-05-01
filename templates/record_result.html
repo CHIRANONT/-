@@ -2,19 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>บันทึกผลการแข่งขัน</title>
+    <title>กรอกผลการแข่งขัน</title>
 </head>
 <body>
-    <h1>บันทึกผลการแข่งขัน: {{ court_name }}</h1>
-    <form method="POST">
-        <h2>เกมที่ 1</h2>
-        ทีม A: <input type="number" name="score_a1" required> vs ทีม B: <input type="number" name="score_b1" required><br>
+    <h1>กรอกผลการแข่งขัน - คอร์ท {{ court_name }}</h1>
 
-        <h2>เกมที่ 2</h2>
-        ทีม A: <input type="number" name="score_a2" required> vs ทีม B: <input type="number" name="score_b2" required><br><br>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+          <li style="color: red;">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
 
-        <input type="submit" value="บันทึกผล">
+    <form method="post">
+        <p>เกมที่ 1: 
+            <input type="number" name="score_a1" required> -
+            <input type="number" name="score_b1" required>
+        </p>
+        <p>เกมที่ 2: 
+            <input type="number" name="score_a2" required> -
+            <input type="number" name="score_b2" required>
+        </p>
+        <button type="submit">✅ ยืนยันผล</button>
     </form>
-    <a href="{{ url_for('home') }}">🏠 กลับหน้าหลัก</a>
+    <br>
+    <a href="{{ url_for('home') }}">⬅️ กลับหน้าหลัก</a>
 </body>
 </html>
