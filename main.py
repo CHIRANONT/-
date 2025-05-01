@@ -244,6 +244,16 @@ def result_log():
         })
     return render_template('result_log.html', results=formatted_results)
 
+# Templates needed:
+# - home.html (with suggest match link)
+# - add_player.html (form to add name & skill)
+# - add_waiting.html (select 4 players form)
+# - setup.html (input player & court names)
+# - record_result.html (input scores)
+# - suggest_match.html (show recommended match and confirm)
+# - summary.html (player stats)
+# - result_log.html (match history)
+
 if __name__ == '__main__':
     threading.Thread(target=update_rest_times, daemon=True).start()
     app.run(host="0.0.0.0", port=81)
