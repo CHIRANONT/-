@@ -2,17 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>สรุป</title>
+    <title>สรุปผลนักกีฬา</title>
 </head>
 <body>
-    <h1>สรุปผลการแข่งขัน</h1>
-    <a href="{{ url_for('home') }}">🏠 กลับหน้าหลัก</a> |
-    <a href="{{ url_for('result_log') }}">📜 ดูผลย้อนหลัง</a>
-    <h2>ผู้เล่น</h2>
-    <ul>
-        {% for player in players %}
-            <li>{{ player.name }} - เล่น {{ player.matches_played }} แมตช์</li>
+    <h1>📊 สรุปผลนักกีฬา</h1>
+
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>#</th>
+            <th>ชื่อ</th>
+            <th>ระดับ</th>
+            <th>สถานะ</th>
+            <th>พักมา (วินาที)</th>
+            <th>แข่งไปแล้ว</th>
+        </tr>
+        {% for p in players %}
+        <tr>
+            <td>{{ p.number }}</td>
+            <td>{{ p.name }}</td>
+            <td>{{ p.skill }}</td>
+            <td>{{ p.status }}</td>
+            <td>{{ p.rest_time }}</td>
+            <td>{{ p.matches_played }}</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </table>
+
+    <br>
+    <a href="{{ url_for('home') }}">⬅️ กลับหน้าหลัก</a>
 </body>
 </html>
