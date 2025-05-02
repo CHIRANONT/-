@@ -2,28 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>เลือก 4 คนเพื่อจับคู่</title>
+    <title>🤖 แนะนำทีมอัตโนมัติ</title>
 </head>
 <body>
-    <h1>เลือกรายชื่อผู้เล่น 4 คน</h1>
+    <h1>🤖 แนะนำทีมอัตโนมัติ</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li style="color: red;">{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    {% if match %}
+        <p><strong>ทีม A:</strong> {{ match.team_a[0] }} & {{ match.team_a[1] }}</p>
+        <p><strong>ทีม B:</strong> {{ match.team_b[0] }} & {{ match.team_b[1] }}</p>
+        <p><strong>ความต่างฝีมือ:</strong> {{ match.diff }}</p>
 
-    <form method="post">
-        {% for player in players %}
-            <input type="checkbox" name="selected_players" value="{{ player.name }}"> {{ player.name }} ({{ player.skill }})<br>
-        {% endfor %}
-        <br>
-        <button type="submit">แนะนำการจัดทีม</button>
-    </form>
+        <form method="POST">
+            <button type="submit">✅ เพิ่มเข้าในคิว</button>
+        </form>
+    {% else %}
+        <p>❌ ไม่สามารถจับคู่ได้ตอนนี้</p>
+    {% endif %}
+
     <br>
     <a href="{{ url_for('home') }}">⬅️ กลับหน้าหลัก</a>
 </body>
