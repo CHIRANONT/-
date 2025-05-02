@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🏆 อันดับผู้เล่น</title>
+</head>
+<body>
+    <h1>🏸 อันดับผู้เล่นตาม Win Rate</h1>
+    <a href="{{ url_for('home') }}">⬅️ กลับหน้าหลัก</a>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>ลำดับ</th>
+            <th>ชื่อ</th>
+            <th>เกมที่เล่น</th>
+            <th>เกมที่ชนะ</th>
+            <th>Win Rate เกม (%)</th>
+            <th>แมตช์ที่เล่น</th>
+            <th>แมตช์ที่ชนะ</th>
+            <th>Win Rate แมตช์ (%)</th>
+        </tr>
+        {% for idx, row in enumerate(ranking) %}
+        <tr>
+            <td>{{ idx + 1 }}</td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.games_played }}</td>
+            <td>{{ row.games_won }}</td>
+            <td>{{ row.game_win_rate }}</td>
+            <td>{{ row.matches_played }}</td>
+            <td>{{ row.matches_won }}</td>
+            <td>{{ row.match_win_rate }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
