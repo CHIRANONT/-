@@ -2,33 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ผลการจับคู่</title>
+    <title>⚖️ ผลการจับทีม</title>
 </head>
 <body>
     <h1>⚖️ ผลการจับทีม</h1>
 
-    <h2>ทีม A</h2>
-    <ul>
-        {% for p in team_a %}
-            <li>{{ p.name }} ({{ p.skill }})</li>
+    <p><strong>ทีม A:</strong> {{ team_a[0].name }} & {{ team_a[1].name }}</p>
+    <p><strong>ทีม B:</strong> {{ team_b[0].name }} & {{ team_b[1].name }}</p>
+    <p><strong>ความต่างฝีมือ:</strong> {{ diff }}</p>
+
+    <form method="POST">
+        {% for p in team_a + team_b %}
+            <input type="hidden" name="selected_players" value="{{ p.name }}">
         {% endfor %}
-    </ul>
-
-    <h2>ทีม B</h2>
-    <ul>
-        {% for p in team_b %}
-            <li>{{ p.name }} ({{ p.skill }})</li>
-        {% endfor %}
-    </ul>
-
-    <p>🎯 ความต่างของคะแนนรวม: {{ diff }}</p>
-
-    <form method="post">
-        <input type="hidden" name="selected_players" value="confirmed">
-        <button type="submit" name="confirm">✅ ยืนยันใช้ทีมนี้</button>
+        <button type="submit" name="confirm">✅ ยืนยันเพิ่มคิวนี้</button>
     </form>
+
     <br>
-    <a href="{{ url_for('auto_pair_select') }}">🔁 กลับไปเลือกใหม่</a> |
     <a href="{{ url_for('home') }}">⬅️ กลับหน้าหลัก</a>
 </body>
 </html>
