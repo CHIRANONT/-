@@ -72,16 +72,12 @@
     <h2>⏳ คิวรอเล่น</h2>
     {% if waiting_queue %}
         <ol>
-            {% for match in waiting_queue %}
+            {% for idx, match in enumerate(waiting_queue) %}
                 <li>
                     {{ match.team_a[0] }} & {{ match.team_a[1] }} 
                     vs 
                     {{ match.team_b[0] }} & {{ match.team_b[1] }}
-                    <form method="POST" action="{{ url_for('remove_match_from_queue') }}" style="display:inline;">
-                        <input type="hidden" name="team_a_0" value="{{ match.team_a[0] }}">
-                        <input type="hidden" name="team_a_1" value="{{ match.team_a[1] }}">
-                        <input type="hidden" name="team_b_0" value="{{ match.team_b[0] }}">
-                        <input type="hidden" name="team_b_1" value="{{ match.team_b[1] }}">
+                    <form method="POST" action="{{ url_for('delete_queue', idx=idx) }}" style="display:inline;">
                         <button type="submit">🗑️ ลบ</button>
                     </form>
                 </li>
