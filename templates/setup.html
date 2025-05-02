@@ -2,59 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Setup</title>
+    <title>⚙️ ตั้งค่าระบบ</title>
 </head>
 <body>
-    <h1>ตั้งค่าคอร์ทและผู้เล่น</h1>
+    <h1>⚙️ ตั้งค่าระบบ</h1>
     <form method="POST">
-        <h2>ชื่อคอร์ท</h2>
-        <div id="court-names">
-            <div>
-                <input type="text" name="court_name">
-                <button type="button" onclick="removeElement(this)">❌</button><br>
-            </div>
+        <h2>🎾 ชื่อคอร์ท</h2>
+        <div id="courts">
+            <input type="text" name="court_name" placeholder="Court 1" required>
         </div>
         <button type="button" onclick="addCourt()">➕ เพิ่มคอร์ท</button>
 
-        <h2>ชื่อนักกีฬาและระดับฝีมือ</h2>
-        <div id="player-list">
-            <div>
-                <input type="text" name="player_name" placeholder="ชื่อนักกีฬา">
-                <select name="player_skill">
-                    <option value="BG">BG</option>
-                    <option value="N-">N-</option>
-                    <option value="N">N</option>
-                </select>
-                <button type="button" onclick="removeElement(this)">❌</button><br>
-            </div>
+        <h2>👥 รายชื่อนักกีฬา</h2>
+        <div id="players">
+            <input type="text" name="player_name" placeholder="ชื่อผู้เล่น" required>
+            <select name="player_skill" required>
+                <option value="BG">BG</option>
+                <option value="N-">N-</option>
+                <option value="N">N</option>
+            </select>
         </div>
-        <button type="button" onclick="addPlayer()">➕ เพิ่มนักกีฬา</button>
+        <button type="button" onclick="addPlayer()">➕ เพิ่มผู้เล่น</button>
 
         <br><br>
-        <input type="submit" value="เริ่มต้นใช้งาน">
+        <button type="submit">✅ เริ่มใช้งาน</button>
     </form>
 
     <script>
         function addCourt() {
-            const div = document.createElement("div");
-            div.innerHTML = '<input type="text" name="court_name"> <button type="button" onclick="removeElement(this)">❌</button><br>';
-            document.getElementById("court-names").appendChild(div);
+            let div = document.getElementById("courts");
+            let input = document.createElement("input");
+            input.type = "text";
+            input.name = "court_name";
+            input.placeholder = "ชื่อคอร์ท";
+            input.required = true;
+            div.appendChild(document.createElement("br"));
+            div.appendChild(input);
         }
 
         function addPlayer() {
-            const div = document.createElement("div");
-            div.innerHTML = '<input type="text" name="player_name" placeholder="ชื่อนักกีฬา"> ' +
-                            '<select name="player_skill">' +
-                                '<option value="BG">BG</option>' +
-                                '<option value="N-">N-</option>' +
-                                '<option value="N">N</option>' +
-                            '</select>' +
-                            ' <button type="button" onclick="removeElement(this)">❌</button><br>';
-            document.getElementById("player-list").appendChild(div);
-        }
+            let div = document.getElementById("players");
+            let name = document.createElement("input");
+            name.type = "text";
+            name.name = "player_name";
+            name.placeholder = "ชื่อผู้เล่น";
+            name.required = true;
 
-        function removeElement(button) {
-            button.parentElement.remove();
+            let select = document.createElement("select");
+            select.name = "player_skill";
+            select.required = true;
+
+            ["BG", "N-", "N"].forEach(function(skill) {
+                let option = document.createElement("option");
+                option.value = skill;
+                option.text = skill;
+                select.appendChild(option);
+            });
+
+            div.appendChild(document.createElement("br"));
+            div.appendChild(name);
+            div.appendChild(select);
         }
     </script>
 </body>
