@@ -46,6 +46,12 @@
             <th>สถานะ</th>
             <th>พักมา (วินาที)</th>
             <th>แข่งไป</th>
+            <th>เกมที่ชนะ</th>
+            <th>เกมทั้งหมด</th>
+            <th>อัตราชนะเกม</th>
+            <th>แมตช์ที่ชนะ</th>
+            <th>แมตช์ทั้งหมด</th>
+            <th>อัตราชนะแมตช์</th>
             <th>เลิกเล่น</th>
         </tr>
         {% for p in players %}
@@ -56,6 +62,24 @@
                 <td>{{ p.status }}</td>
                 <td>{{ p.rest_time }}</td>
                 <td>{{ p.matches_played }}</td>
+                <td>{{ p.games_won|default(0) }}</td>
+                <td>{{ p.games_played|default(0) }}</td>
+                <td>
+                    {% if p.games_played > 0 %}
+                        {{ '%.0f'|format(p.games_won / p.games_played * 100) }}%
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{ p.match_wins|default(0) }}</td>
+                <td>{{ p.match_total|default(0) }}</td>
+                <td>
+                    {% if p.match_total > 0 %}
+                        {{ '%.0f'|format(p.match_wins / p.match_total * 100) }}%
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td>
                     {% if p.status != 'done' %}
                         <form method="POST" action="{{ url_for('mark_done', player_name=p.name) }}">
