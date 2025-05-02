@@ -1,10 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for
 import threading
 import time
 from itertools import combinations
 
 app = Flask(__name__)
-app.secret_key = 'secret'
 
 courts = []
 players = []
@@ -76,6 +75,12 @@ def add_waiting():
     available_players = [p for p in players if p['status'] == 'waiting' and p['name'] not in used_names]
     return render_template('add_waiting.html', players=available_players)
 
+@app.route('/delete_queue/<int:index>', methods=['POST'])
+def delete_queue(index):
+    if 0 <= index < len(waiting_queue):
+        del waiting_queue[index]
+    return redirect(url_for('home'))
+
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
     global player_counter
@@ -135,8 +140,7 @@ def finish_match(court_idx):
             scores_a2 = int(request.form['score_a2'])
             scores_b2 = int(request.form['score_b2'])
         except (KeyError, ValueError):
-            flash('❌ โปรดกรอกคะแนนให้ครบทุกช่อง')
-            return redirect(url_for('finish_match', court_idx=court_idx))
+            return "❌ โปรดกรอกคะแนนให้ครบทุกช่อง", 400
 
         win_a = (scores_a1 > scores_b1) + (scores_a2 > scores_b2)
         win_b = (scores_b1 > scores_a1) + (scores_b2 > scores_a2)
