@@ -44,6 +44,9 @@ def setup():
                 'status': 'waiting',
                 'rest_time': 0,
                 'matches_played': 0,
+                'games_played': 0,
+                'games_won': 0,
+                'matches_won': 0,
                 'number': player_counter
             })
             player_counter += 1
@@ -62,7 +65,6 @@ def add_waiting():
     if request.method == 'POST':
         team_a = request.form.getlist('team_a')
         team_b = request.form.getlist('team_b')
-
         if len(team_a) == 2 and len(team_b) == 2:
             waiting_queue.append({'team_a': team_a, 'team_b': team_b})
         return redirect(url_for('home'))
@@ -74,12 +76,6 @@ def add_waiting():
 
     available_players = [p for p in players if p['status'] == 'waiting' and p['name'] not in used_names]
     return render_template('add_waiting.html', players=available_players)
-
-@app.route('/delete_queue/<int:index>', methods=['POST'])
-def delete_queue(index):
-    if 0 <= index < len(waiting_queue):
-        del waiting_queue[index]
-    return redirect(url_for('home'))
 
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
@@ -93,6 +89,9 @@ def add_player():
             'status': 'waiting',
             'rest_time': 0,
             'matches_played': 0,
+            'games_played': 0,
+            'games_won': 0,
+            'matches_won': 0,
             'number': player_counter
         })
         player_counter += 1
@@ -142,8 +141,13 @@ def finish_match(court_idx):
         except (KeyError, ValueError):
             return "❌ โปรดกรอกคะแนนให้ครบทุกช่อง", 400
 
-        win_a = (scores_a1 > scores_b1) + (scores_a2 > scores_b2)
-        win_b = (scores_b1 > scores_a1) + (scores_b2 > scores_a2)
+        game_results = [
+            (scores_a1, scores_b1),
+            (scores_a2, scores_b2)
+        ]
+
+        win_a = sum(1 for a, b in game_results if a > b)
+        win_b = sum(1 for a, b in game_results if b > a)
 
         if win_a == win_b:
             result_type = 'เสมอ'
@@ -163,20 +167,64 @@ def finish_match(court_idx):
         match_history.append(match_result)
 
         for name in match['team_a'] + match['team_b']:
-            for player in players:
-                if player['name'] == name:
-                    player['status'] = 'waiting'
-                    player['matches_played'] += 1
+            for p in players:
+                if p['name'] == name:
+                    p['status'] = 'waiting'
+                    p['games_played'] += 2
+                    p['matches_played'] += 1
                     break
+
+        if result_type == 'ทีม A ชนะ':
+            for name in match['team_a']:
+                for p in players:
+                    if p['name'] == name:
+                        p['games_won'] += win_a
+                        p['matches_won'] += 1
+            for name in match['team_b']:
+                for p in players:
+                    if p['name'] == name:
+                        p['games_won'] += win_b
+        elif result_type == 'ทีม B ชนะ':
+            for name in match['team_b']:
+                for p in players:
+                    if p['name'] == name:
+                        p['games_won'] += win_b
+                        p['matches_won'] += 1
+            for name in match['team_a']:
+                for p in players:
+                    if p['name'] == name:
+                        p['games_won'] += win_a
+        else:
+            for name in match['team_a'] + match['team_b']:
+                for p in players:
+                    if p['name'] == name:
+                        p['games_won'] += win_a
 
         courts[court_idx]['current_match'] = None
         return redirect(url_for('home'))
 
     return render_template('record_result.html', match=match, court_name=courts[court_idx]['name'])
 
+@app.route('/delete_queue/<int:idx>', methods=['POST'])
+def delete_queue(idx):
+    if 0 <= idx < len(waiting_queue):
+        waiting_queue.pop(idx)
+    return redirect(url_for('home'))
+
 @app.route('/summary')
 def summary():
-    return render_template('summary.html', players=players, match_history=match_history)
+    summary_data = []
+    for p in players:
+        game_win_rate = f"{(p['games_won'] / p['games_played'] * 100):.1f}%" if p['games_played'] > 0 else "-"
+        match_win_rate = f"{(p['matches_won'] / p['matches_played'] * 100):.1f}%" if p['matches_played'] > 0 else "-"
+        summary_data.append({
+            'name': p['name'],
+            'game_played': p['games_played'],
+            'game_win_rate': game_win_rate,
+            'match_played': p['matches_played'],
+            'match_win_rate': match_win_rate
+        })
+    return render_template('summary.html', summary=summary_data)
 
 @app.route('/result_log')
 def result_log():
