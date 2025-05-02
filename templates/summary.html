@@ -2,31 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>สรุปผลนักกีฬา</title>
+    <title>📊 สรุปสถิตินักกีฬา</title>
 </head>
 <body>
-    <h1>📊 สรุปผลนักกีฬา</h1>
+    <h1>📊 สรุปสถิตินักกีฬา</h1>
 
-    <table border="1" cellpadding="6">
-        <tr>
-            <th>#</th>
-            <th>ชื่อ</th>
-            <th>ระดับ</th>
-            <th>สถานะ</th>
-            <th>พักมา (วินาที)</th>
-            <th>แข่งไปแล้ว</th>
-        </tr>
-        {% for p in players %}
-        <tr>
-            <td>{{ p.number }}</td>
-            <td>{{ p.name }}</td>
-            <td>{{ p.skill }}</td>
-            <td>{{ p.status }}</td>
-            <td>{{ p.rest_time }}</td>
-            <td>{{ p.matches_played }}</td>
-        </tr>
-        {% endfor %}
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>ชื่อ</th>
+                <th>ระดับ</th>
+                <th>สถานะ</th>
+                <th>พักมา (วินาที)</th>
+                <th>แข่งไป</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in players %}
+                <tr>
+                    <td>{{ p.number }}</td>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.skill }}</td>
+                    <td>{{ p.status }}</td>
+                    <td>{{ p.rest_time }}</td>
+                    <td>{{ p.matches_played }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
+
+    <h2>📈 ประวัติการแข่งขัน</h2>
+    <ul>
+        {% for match in match_history %}
+            <li>{{ match.court }}: {{ match.team_a[0] }} & {{ match.team_a[1] }} vs {{ match.team_b[0] }} & {{ match.team_b[1] }} - {{ match.result_type }}</li>
+        {% endfor %}
+    </ul>
 
     <br>
     <a href="{{ url_for('home') }}">⬅️ กลับหน้าหลัก</a>
