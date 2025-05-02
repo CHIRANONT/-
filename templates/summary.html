@@ -2,44 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>📊 สรุปสถิตินักกีฬา</title>
+    <title>📊 สรุปสถิติ</title>
 </head>
 <body>
-    <h1>📊 สรุปสถิตินักกีฬา</h1>
-
-    <table border="1" cellpadding="5">
+    <h1>📊 สรุปสถิติผู้เล่น</h1>
+    <a href="{{ url_for('home') }}">⬅️ กลับหน้าหลัก</a>
+    <br><br>
+    <table border="1" cellpadding="6">
         <thead>
             <tr>
-                <th>#</th>
+                <th>ลำดับ</th>
                 <th>ชื่อ</th>
-                <th>ระดับ</th>
-                <th>สถานะ</th>
-                <th>พักมา (วินาที)</th>
-                <th>แข่งไป</th>
+                <th>เกมที่เล่น</th>
+                <th>ชนะเกม (%)</th>
+                <th>แมตช์ที่เล่น</th>
+                <th>ชนะแมตช์ (%)</th>
             </tr>
         </thead>
         <tbody>
-            {% for p in players %}
-                <tr>
-                    <td>{{ p.number }}</td>
-                    <td>{{ p.name }}</td>
-                    <td>{{ p.skill }}</td>
-                    <td>{{ p.status }}</td>
-                    <td>{{ p.rest_time }}</td>
-                    <td>{{ p.matches_played }}</td>
-                </tr>
+            {% for idx, p in enumerate(summary, start=1) %}
+            <tr>
+                <td>{{ idx }}</td>
+                <td>{{ p.name }}</td>
+                <td>{{ p.game_played }}</td>
+                <td>{{ p.game_win_rate }}</td>
+                <td>{{ p.match_played }}</td>
+                <td>{{ p.match_win_rate }}</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
-
-    <h2>📈 ประวัติการแข่งขัน</h2>
-    <ul>
-        {% for match in match_history %}
-            <li>{{ match.court }}: {{ match.team_a[0] }} & {{ match.team_a[1] }} vs {{ match.team_b[0] }} & {{ match.team_b[1] }} - {{ match.result_type }}</li>
-        {% endfor %}
-    </ul>
-
-    <br>
-    <a href="{{ url_for('home') }}">⬅️ กลับหน้าหลัก</a>
 </body>
 </html>
