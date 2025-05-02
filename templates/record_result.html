@@ -7,23 +7,28 @@
 <body>
     <h1>กรอกผลการแข่งขัน - คอร์ท {{ court_name }}</h1>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+          <li style="color: red;">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
     <form method="post">
         <p><strong>ทีม A:</strong> {{ match.team_a[0] }} & {{ match.team_a[1] }}</p>
         <p><strong>ทีม B:</strong> {{ match.team_b[0] }} & {{ match.team_b[1] }}</p>
 
         <p>เกมที่ 1: 
-            {{ match.team_a[0] }} & {{ match.team_a[1] }} 
             <input type="number" name="score_a1" required> -
-            <input type="number" name="score_b1" required> 
-            {{ match.team_b[0] }} & {{ match.team_b[1] }}
+            <input type="number" name="score_b1" required>
         </p>
         <p>เกมที่ 2: 
-            {{ match.team_a[0] }} & {{ match.team_a[1] }} 
             <input type="number" name="score_a2" required> -
-            <input type="number" name="score_b2" required> 
-            {{ match.team_b[0] }} & {{ match.team_b[1] }}
+            <input type="number" name="score_b2" required>
         </p>
-
         <button type="submit">✅ ยืนยันผล</button>
     </form>
     <br>
